@@ -1,0 +1,16 @@
+module.exports.admin = {
+  ADMIN_LINE_ID: process.env.ADMIN_LINE_ID,
+};
+
+module.exports.logbook = {
+  LOGBOOK_API: process.env.LOGBOOK_API,
+  LINE_CHANNEL_ID: process.env.LOGBOOK_LINE_CHANNEL_ID,
+  LINE_CHANNEL_SECRET: process.env.LOGBOOK_LINE_CHANNEL_SECRET,
+  LINE_CHANNEL_ACCESS: process.env.LOGBOOK_LINE_CHANNEL_ACCESS,
+};
+
+module.exports.indodax = {
+  LINE_CHANNEL_ID: process.env.INDODAX_LINE_CHANNEL_ID,
+  LINE_CHANNEL_SECRET: process.env.INDODAX_LINE_CHANNEL_SECRET,
+  LINE_CHANNEL_ACCESS: process.env.INDODAX_LINE_CHANNEL_ACCESS,
+};
