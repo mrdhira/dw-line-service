@@ -119,10 +119,16 @@ const helpTextHandler = (event) => {
     text: 'DITA command list:\n'
     + '- Login ke dalam logbook (tenang username dan password tidak akan tersave):\n'
     + '/login username password\n\n'
+    + '- Logout dari logbook:\n'
+    + '/logout\n\n'
     + '- Cek status pengisian logbook kalian:\n'
     + '/check\n\n'
     + '- Mengisi logbook harian:\n'
     + '/insert\nclock-in\nclock-out\nactivity\ndescripti\n\n'
+    + '- Mengubah settingan daily reminder:\n'
+    + '/isdailyreminder [on/off]\n\n'
+    + '- Mengubah settingal auto fill weekend:\n'
+    + '/isautofillweekend [on/off]\n\n'
     + '- Mau chat DITA?^^ bisa menggunakan command di bawah ini, maaf ya kalau DITA lama balasnya hehehe\n'
     + '/admin [isi chatnya disini, jangan curhat ya hehehe]\n\n'
     + 'Semoga membantu^^ jangan sungkan buat chat DITA.'
@@ -281,13 +287,11 @@ const checkTextHandler = (event) => {
             const form = { replyToken, messages: [replyMessage] };
             return lineService.replyMessage(form, ACCESS_TOKEN);
           } else {
+            let message = check.message;
+            if (check.data && check.data.logbookDetail) message = message + '\n' + check.data.logbookDetail;
             const replyMessage = {
               type: 'text',
-              text: check.message +
-                ( 
-                  ( '\n' +  (check.data.logbookDetail) )
-                  || ''
-                ),
+              text: message,
             };
             const form = { replyToken, messages: [replyMessage] };
             return lineService.replyMessage(form, ACCESS_TOKEN);
