@@ -283,7 +283,11 @@ const checkTextHandler = (event) => {
           } else {
             const replyMessage = {
               type: 'text',
-              text: check.message + '\n' + check.data.logbookDetail,
+              text: check.message +
+                ( 
+                  ( '\n' +  (check.data.logbookDetail) )
+                  || ''
+                ),
             };
             const form = { replyToken, messages: [replyMessage] };
             return lineService.replyMessage(form, ACCESS_TOKEN);
