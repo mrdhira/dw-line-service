@@ -95,6 +95,8 @@ const textHandler = (event) => {
       return sendTextHandler(event);
     case '/blast':
       return blastTextHandler(event);
+    case '/list':
+      return listUserTextHandler(event);
     default:
       return textErrorHandler(event);
   };
@@ -250,7 +252,6 @@ const logoutTextHandler = async (event) => {
 // /CHECK
 const checkTextHandler = (event) => {
   logGreen('Logbook Controller - Check Text Handler');
-  logGreen('LOGBOOK - MESSAGE - CHECK LOGBOOK TEXT HANDLER');
   const { replyToken, source, timestamp, message } = event;
   const { type, id, text } = message;
   const arrText = text.split(' ');
@@ -310,6 +311,7 @@ const checkTextHandler = (event) => {
  * @description {string}
  */
 const insertTextHandler = (event) => {
+  logGreen('Logbook Controller - Insert Text Handler');
   const { replyToken, source, timestamp, message } = event;
   const { type, id, text } = message;
   const arrText = text.split(/\n/);
@@ -373,6 +375,7 @@ const insertTextHandler = (event) => {
  * @chat {text}
  */
 const adminTextHandler = async (event) => {
+  logGreen('Logbook Controller - Admin Text Handler');
   const { replyToken, source, timestamp, message } = event;
   const { type, id, text } = message;
   const arrText = text.split(' ');
@@ -389,20 +392,21 @@ const adminTextHandler = async (event) => {
       type: 'text',
       text: 'Ditunggu yaa, DITA hubungi ke adminya dulu.',
     };
-    const pushMessageLineId = {
-      type: 'text',
-      text: source.userId,
-    };
-    const pushMessage = {
-      type: 'text',
-      text: `[${source.userId}]/${Moment(timestamp).tz('Asia/Jakarta').format('DD/MM/YYYY HH:mm:ss')}:\n${msg}`,
-    };
+    const line_profile = await lineService.getProfile(source.userId, ACCESS_TOKEN);
+    const pushMessage = [
+      {
+        type: 'text',
+        text: 'LineId: ' + source.userId,
+      },
+      {
+        type: 'text',
+        text: `[${line_profile.displayName}]/${Moment(timestamp).tz('Asia/Jakarta').format('DD/MM/YYYY HH:mm:ss')}:\n${msg}`,
+      },
+    ];
     const formReplyMessage = { replyToken, messages: [replyMessage] };
     await lineService.replyMessage(formReplyMessage, ACCESS_TOKEN);
-    const formPushMessageLineId = { to:admin.ADMIN_LINE_ID, messages: [pushMessageLineId] };
-    await lineService.pushMessage(formPushMessageLineId, ACCESS_TOKEN);
-    const formPushMessage = { to:admin.ADMIN_LINE_ID, messages: [pushMessage] };
-    return lineService.pushMessage(formPushMessage, ACCESS_TOKEN);
+    const formPushMessage = { to:admin.ADMIN_LINE_ID, messages: pushMessage };
+    return lineService.pushMessage(formPushMessage, ACCESS_TOKEN).catch( (err) => console.log(err));
   };
 };
  /**
@@ -412,6 +416,7 @@ const adminTextHandler = async (event) => {
   * @chat {text}
   */
 const sendTextHandler = (event) => {
+  logGreen('Logbook Controller - Send Text Handler');
   const { replyToken, source, timestamp, message } = event;
   const { type, id, text } = message;
   const arrText = text.split(' ');
@@ -446,6 +451,7 @@ const sendTextHandler = (event) => {
  * @chat {text}
  */
 const blastTextHandler = (event) => {
+  logGreen('Logbook Controller - Blast Text Handler');
   const { replyToken, source, timestamp, message } = event;
   const { type, id, text } = message;
   const arrText = text.split(' ');
@@ -640,6 +646,50 @@ const isAutoFillWeekEndTextHandler = async (event) => {
       const form = { replyToken, messages: [replyMessage] };
       return lineService.replyMessage(form, ACCESS_TOKEN);
     };
+  };
+};
+// List all user
+const listUserTextHandler = (event) => {
+  logGreen('Logbook Controller - List User Text Handler');
+  const { replyToken, source, timestamp, message } = event;
+  const { type, id, text } = message;
+  const arrText = text.split(' ');
+  if (source.userId != admin.ADMIN_LINE_ID) {
+    const replyMessage = {
+      type: 'text',
+      text: 'Kamu bukan admin lho.',
+    };
+    const form = { replyToken, messages: [replyMessage] };
+    return lineService.replyMessage(form, ACCESS_TOKEN);
+  } else if (arrText.length !=  1) {
+    const replyMessage = {
+      type: 'text',
+      text: 'Format list user salah, yuk benerin formatnya kayak gini => /list all user',
+    };
+    const form = { replyToken, messages: [replyMessage] };
+    return lineService.replyMessage(form, ACCESS_TOKEN);
+  } else {
+    return logbookService.findAllUser()
+    .then( (res) => JSON.parse(res.body))
+    .then( (res) => {
+      const users = res.data;
+      console.log(users);
+      let text = 'User List:\n\n';
+      users.forEach( (user) => {
+        text = text + 'Full Name: ' + user.full_name + '\n';
+        text = text + 'LineId: ' + user.line_id + '\n';
+        if (user.cookie) text = text + 'Cookie: ' + 'Exists\n';
+        if (user.isDailyReminder) text = text + 'isDailyReminder: ' + 'Active\n';
+        if (user.isAutoFillWeekend) text = text + 'isAutoFillWeekend: ' + 'Active\n';
+        if (user.isFollow) text = text + 'isFollow: ' + 'Follow!\n';
+      });
+      const replyMessage = {
+        type: 'text',
+        text,
+      };
+      const form = { replyToken, messages: [replyMessage] };
+      return lineService.replyMessage(form, ACCESS_TOKEN);
+    });
   };
 };
 // ===== WEBHOOK ===== //
