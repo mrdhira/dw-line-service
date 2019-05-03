@@ -674,9 +674,9 @@ const listUserTextHandler = (event) => {
     .then( (res) => {
       const users = res.data;
       console.log(users);
-      let text = 'User List:\n\n';
+      let text = 'User List:\n';
       users.forEach( (user) => {
-        text = text + 'Full Name: ' + user.full_name + '\n';
+        text = text + '\nFull Name: ' + user.full_name + '\n';
         text = text + 'LineId: ' + user.line_id + '\n';
         if (user.cookie) text = text + 'Cookie: ' + 'Exists\n';
         if (user.isDailyReminder) text = text + 'isDailyReminder: ' + 'Active\n';
