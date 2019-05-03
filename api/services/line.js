@@ -25,7 +25,7 @@ module.exports.replyMessage = (form, ACCESS_TOKEN) => {
     },
     body: form,
     json: true,
-  });
+  })
 };
 // Returns the status code 200 and an empty JSON object.
 
@@ -50,7 +50,7 @@ module.exports.pushMessage = (form, ACCESS_TOKEN) => {
     },
     body: form,
     json: true,
-  });
+  })
 };
 // Returns the status code 200 and an empty JSON object.
 
