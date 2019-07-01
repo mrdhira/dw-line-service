@@ -41,6 +41,7 @@ const setUser = async (users) => {
     const check = checkLogbook.message;
     if (check.match(/You haven't filled activity on/)) {
       console.log(counter);
+      console.log(user.full_name);
       console.log(user.line_id);
       await userList.push(user.line_id);
     }
